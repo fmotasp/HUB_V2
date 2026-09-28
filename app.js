@@ -220,61 +220,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnOpenStyles = document.getElementById('btn-open-styles');
     const closeStylesModal = document.getElementById('close-styles-modal');
     const stylesGridContent = document.getElementById('styles-grid-content');
+    
+    // Create Style Logic
+    const btnCreateStyle = document.getElementById('btn-create-style');
+    const createStyleModal = document.getElementById('create-style-modal');
+    const closeCreateStyleModal = document.getElementById('close-create-style-modal');
+    const saveNewStyleBtn = document.getElementById('save-new-style-btn');
+    const newStyleName = document.getElementById('new-style-name');
+    const newStyleDirection = document.getElementById('new-style-direction');
 
-    let selectedStyleTag = "realistic";
+    let selectedStyleTag = { name: "realistic", prompt: "realistic" };
 
-    const dummyStyles = [
-        { name: "photo", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop" },
-        { name: "natural", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" },
-        { name: "popsurrealism", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=300&h=300&fit=crop" },
-        { name: "editorial", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" },
-        { name: "illustration", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=300&fit=crop" },
-        { name: "character3d", img: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=300&h=300&fit=crop" },
-        { name: "craftmotion", img: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=300&h=300&fit=crop" },
-        { name: "classic-anime", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&h=300&fit=crop" },
-        { name: "vector", img: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=300&h=300&fit=crop" },
-        { name: "3d-character", img: "https://images.unsplash.com/photo-1608889825103-eb5ed706fc64?w=300&h=300&fit=crop" },
-        { name: "dotted", img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=300&h=300&fit=crop" },
-        { name: "holography", img: "https://images.unsplash.com/photo-1618005192384-a83a8bd57fbe?w=300&h=300&fit=crop" }
+    const defaultStyles = [
+        { name: "photo", prompt: "photorealistic, hyperrealistic, 85mm lens", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop" },
+        { name: "natural", prompt: "natural lighting, candid, unedited look", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop" },
+        { name: "popsurrealism", prompt: "pop surrealism, vibrant colors, dreamlike", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=300&h=300&fit=crop" },
+        { name: "editorial", prompt: "high fashion editorial, studio lighting, vogue", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" },
+        { name: "illustration", prompt: "digital illustration, flat colors, clean lines", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=300&fit=crop" },
+        { name: "character3d", prompt: "3d character render, Pixar style, octane render", img: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=300&h=300&fit=crop" },
+        { name: "classic-anime", prompt: "90s classic anime style, cel shaded", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&h=300&fit=crop" }
     ];
 
-    if (btnOpenStyles && stylesModal) {
-        btnOpenStyles.addEventListener('click', () => {
-            stylesGridContent.innerHTML = '';
+    let customStyles = JSON.parse(localStorage.getItem('customStyles')) || [];
+
+    function renderStylesGrid() {
+        if (!stylesGridContent) return;
+        stylesGridContent.innerHTML = '';
+        
+        const fullList = [...customStyles, ...defaultStyles];
+        
+        fullList.forEach(style => {
+            const btn = document.createElement('button');
+            btn.className = 'flex flex-col gap-2 text-left group transform transition-transform active:scale-95';
+            const displayImg = style.img || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=300&fit=crop&blur=100'; // fallback
             
-            // Repeat to fill the screen like the mockup
-            const fullList = [...dummyStyles, ...dummyStyles, ...dummyStyles, ...dummyStyles];
+            btn.innerHTML = `
+                <div class="aspect-square w-full rounded-2xl overflow-hidden bg-surface2 relative border-2 border-transparent focus-within:border-brand transition-colors ring-offset-dark focus-within:ring-2 focus-within:ring-brand">
+                    <img src="${displayImg}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    ${!style.img ? `<div class="absolute inset-0 flex items-center justify-center bg-black/40"><i class="fa-solid fa-wand-magic-sparkles text-white text-2xl"></i></div>` : ''}
+                </div>
+                <span class="text-[11px] text-gray-400 font-medium px-1 truncate w-full">#${style.name}</span>
+            `;
             
-            fullList.forEach(style => {
-                const btn = document.createElement('button');
-                btn.className = 'flex flex-col gap-2 text-left group transform transition-transform active:scale-95';
-                btn.innerHTML = `
-                    <div class="aspect-square w-full rounded-2xl overflow-hidden bg-surface2 relative border-2 border-transparent focus-within:border-brand transition-colors ring-offset-dark focus-within:ring-2 focus-within:ring-brand">
-                        <img src="${style.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <span class="text-[11px] text-gray-400 font-medium px-1 truncate w-full">#${style.name}</span>
-                `;
-                btn.addEventListener('click', () => {
-                    selectedStyleTag = style.name;
-                    stylesModal.classList.add('hidden');
-                    stylesModal.classList.remove('flex');
-                    
-                    // Visual feedback on the reference button
+            btn.addEventListener('click', () => {
+                selectedStyleTag = style;
+                stylesModal.classList.add('hidden');
+                stylesModal.classList.remove('flex');
+                
+                // Visual feedback
+                if(btnOpenStyles) {
                     btnOpenStyles.classList.add('border-brand', 'bg-brand/10', 'text-white');
                     btnOpenStyles.classList.remove('border-white/20', 'bg-surface', 'text-gray-400');
                     btnOpenStyles.innerHTML = `
                         <div class="w-full h-full rounded-2xl overflow-hidden relative">
-                            <img src="${style.img}" class="w-full h-full object-cover opacity-60">
+                            <img src="${displayImg}" class="w-full h-full object-cover opacity-60">
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
                                 <i class="fa-solid fa-check text-xl mb-1 text-white drop-shadow-md"></i>
                                 <span class="text-[10px] font-medium text-white drop-shadow-md truncate max-w-full px-1">${style.name}</span>
                             </div>
                         </div>
                     `;
-                });
-                stylesGridContent.appendChild(btn);
+                }
             });
-            
+            stylesGridContent.appendChild(btn);
+        });
+    }
+
+    if (btnOpenStyles && stylesModal) {
+        btnOpenStyles.addEventListener('click', () => {
+            renderStylesGrid();
             stylesModal.classList.remove('hidden');
             stylesModal.classList.add('flex');
         });
@@ -282,6 +296,40 @@ document.addEventListener('DOMContentLoaded', () => {
         closeStylesModal.addEventListener('click', () => {
             stylesModal.classList.add('hidden');
             stylesModal.classList.remove('flex');
+        });
+    }
+
+    // Create custom style events
+    if (btnCreateStyle && createStyleModal) {
+        btnCreateStyle.addEventListener('click', () => {
+            createStyleModal.classList.remove('hidden');
+            createStyleModal.classList.add('flex');
+        });
+
+        closeCreateStyleModal.addEventListener('click', () => {
+            createStyleModal.classList.add('hidden');
+            createStyleModal.classList.remove('flex');
+        });
+
+        saveNewStyleBtn.addEventListener('click', () => {
+            const name = newStyleName.value.trim().toLowerCase().replace(/\s+/g, '-');
+            const direction = newStyleDirection.value.trim();
+            
+            if (name && direction) {
+                customStyles.unshift({
+                    name: name,
+                    prompt: direction,
+                    img: null // user can't upload yet, we use fallback
+                });
+                localStorage.setItem('customStyles', JSON.stringify(customStyles));
+                
+                newStyleName.value = '';
+                newStyleDirection.value = '';
+                
+                createStyleModal.classList.add('hidden');
+                createStyleModal.classList.remove('flex');
+                renderStylesGrid(); // refresh grid
+            }
         });
     }
 
@@ -304,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             brandStyle = brands[selectedBrandIndex].direction;
         }
 
-        const styleSelect = selectedStyleTag; // Use visual tag selection
+        const styleSelect = selectedStyleTag.prompt; // Use the actual prompt direction
 
         if(!promptInput.trim()) {
             document.getElementById('prompt-input').classList.add('border-red-500');
@@ -331,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const selectedFormats = Array.from(document.querySelectorAll('.format-btn.active')).map(b => b.getAttribute('data-format'));
 
-            const response = await fetch('http://localhost:3000/api/generate-krea', {
+            const response = await fetch('/api/generate-krea', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

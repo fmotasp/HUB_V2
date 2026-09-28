@@ -261,7 +261,6 @@
         <div class="px-8 py-4 flex items-center justify-between border-b border-white/5 bg-surface2/50 backdrop-blur-xl shrink-0">
             <div class="flex gap-2">
                 <button class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-medium">Biblioteca</button>
-                <button class="px-5 py-2 rounded-full text-gray-400 hover:text-white text-sm font-medium">Por Magnific</button>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex gap-1 mr-4">
@@ -271,7 +270,7 @@
                     <button class="text-xs text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full">Design</button>
                 </div>
                 <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"><i class="fa-solid fa-search"></i></button>
-                <button class="px-5 py-2.5 rounded-full bg-white text-dark font-medium text-sm flex items-center gap-2 transform active:scale-95 transition-all"><i class="fa-solid fa-plus"></i> Criar</button>
+                <button id="btn-create-style" class="px-5 py-2.5 rounded-full bg-white text-dark font-medium text-sm flex items-center gap-2 transform active:scale-95 transition-all"><i class="fa-solid fa-plus"></i> Criar</button>
             </div>
         </div>
 
@@ -279,6 +278,31 @@
         <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
             <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-x-4 gap-y-6" id="styles-grid-content">
                 <!-- Javascript will populate this with images -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Style Modal Overlay -->
+    <div id="create-style-modal" class="fixed inset-0 bg-[#000000]/80 backdrop-blur-md z-[110] hidden items-center justify-center">
+        <div class="bg-[#151515] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-white">Criar Novo Estilo</h3>
+                <button id="close-create-style-modal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-2">Nome do Estilo</label>
+                    <input type="text" id="new-style-name" class="w-full bg-dark border border-white/5 rounded-lg p-3 text-sm text-white focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all" placeholder="Ex: Neon Cyberpunk">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-2">Direcionamento Visual (Prompt base)</label>
+                    <textarea id="new-style-direction" rows="3" class="w-full bg-dark border border-white/5 rounded-lg p-3 text-sm text-white focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all resize-none custom-scrollbar" placeholder="Ex: iluminação dramática, cores neon rosa e azul, estilo futurista..."></textarea>
+                </div>
+                <button type="button" id="save-new-style-btn" class="w-full mt-4 bg-white text-dark font-medium py-3 rounded-xl hover:bg-gray-200 transition-all active:scale-95">
+                    Salvar Estilo
+                </button>
             </div>
         </div>
     </div>

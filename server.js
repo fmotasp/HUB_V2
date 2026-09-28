@@ -3,11 +3,12 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Permite que o frontend (aberto no navegador) acesse este servidor
-app.use(express.json()); // Permite interpretar o JSON enviado pelo frontend
+app.use(cors()); // Permite que o frontend acesse este servidor
+app.use(express.json()); // Permite interpretar o JSON
+app.use(express.static(__dirname)); // Serve o index.html, app.js e CSS
 
 // Rota de Geração - Ponte com o Krea
 app.post('/api/generate-krea', async (req, res) => {
@@ -77,3 +78,4 @@ app.listen(port, () => {
     console.log(`🚀 Servidor Ponte do Hub rodando em http://localhost:${port}`);
     console.log(`🔑 KREA_API_KEY configurada: ${process.env.KREA_API_KEY ? 'Sim' : 'Não'}`);
 });
+module.exports = app;
