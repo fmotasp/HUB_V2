@@ -1,0 +1,45 @@
+/* Minimalist Dark Mode / High-end UI Styles */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar for a cleaner look */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Brand Buttons Active State */
+.brand-btn.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Canvas Image Fade In */
+@keyframes imageReveal {
+    0% { opacity: 0; transform: scale(0.98); filter: blur(10px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+}
+
+.img-reveal {
+    animation: imageReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+}
+
+/* Select styling resets */
+select option {
+    background-color: #141416;
+    color: white;
+}

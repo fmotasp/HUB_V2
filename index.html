@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand AI Hub | Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#000000',      // Apple True Black
+                        surface: '#151515',   // Apple Dark Grey
+                        surface2: '#1d1d1f',  // Lighter Dark Grey
+                        brand: '#2997ff',     // Apple Blue (Dark mode friendly)
+                        greencta: '#2997ff',  // Replacing green with blue (Apple only uses one accent)
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Helvetica Neue"', 'sans-serif'],
+                        display: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Helvetica Neue"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-dark text-gray-100 font-sans h-screen flex overflow-hidden">
+    
+    <!-- Left Navigation Bar -->
+    <nav class="w-20 bg-[#151515]/60 backdrop-blur-3xl border-r border-white/10 flex flex-col items-center py-6 gap-6 h-full z-20 shrink-0">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand to-brandHover flex items-center justify-center shadow-lg mb-4">
+            <i class="fa-solid fa-layer-group text-lg text-white"></i>
+        </div>
+        
+        <button id="nav-create-brand" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition group relative transform active:scale-95" title="Criar Marca">
+            <i class="fa-solid fa-folder-plus text-lg"></i>
+            <span class="absolute left-full ml-4 px-2 py-1 bg-white/10 backdrop-blur-md text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Criar Marca</span>
+        </button>
+
+        <button id="nav-generate" class="w-12 h-12 rounded-full text-gray-500 flex items-center justify-center hover:text-white hover:bg-white/5 transition group relative transform active:scale-95" title="Gerar Imagens">
+            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+            <span class="absolute left-full ml-4 px-2 py-1 bg-white/10 backdrop-blur-md text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-50">Gerar Imagens</span>
+        </button>
+    </nav>
+
+    <!-- Left Sidebar: Controls -->
+    <aside class="w-[400px] bg-[#151515]/60 backdrop-blur-3xl border-r border-white/10 flex flex-col h-full z-10 shrink-0">
+        
+        <!-- Header -->
+        <div class="p-6 pb-4 border-b border-white/5 flex items-center justify-between">
+            <h1 id="sidebar-title" class="font-semibold tracking-tight text-lg">Nova Marca</h1>
+            <button class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-gear"></i></button>
+        </div>
+
+        <!-- View: Create Brand -->
+        <div id="view-create-brand" class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar block">
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider text-[11px]">Detalhes do Cliente</h2>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-xs text-brand mb-3 font-medium">Selecione para Editar ou Criar</label>
+                    <div id="edit-brand-grid" class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x">
+                        <!-- Cards will be injected here via JS -->
+                    </div>
+                </div>
+
+                <form id="add-brand-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-2">Nome da Marca</label>
+                        <input type="text" id="new-brand-name" class="w-full bg-surface2 border border-white/5 rounded-lg p-3 text-sm text-white focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all" placeholder="Ex: Minha Marca">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-2">Direcionamento</label>
+                        <textarea id="new-brand-direction" rows="4" class="w-full bg-surface2 border border-white/5 rounded-lg p-3 text-sm text-white focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all resize-none custom-scrollbar" placeholder="Instruções de estilo e tom..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-2">Logo do Cliente (PNG, JPG)</label>
+                        <input type="file" id="new-brand-logo" accept="image/png, image/jpeg, image/svg+xml" class="w-full bg-surface2 border border-white/5 rounded-lg p-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-brand/20 file:text-brand hover:file:bg-brand/30 transition-all cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-2">Brandbook (PDF, DOCS)</label>
+                        <input type="file" id="new-brand-file" accept=".pdf,.doc,.docx" class="w-full bg-surface2 border border-white/5 rounded-lg p-2 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-brand/20 file:text-brand hover:file:bg-brand/30 transition-all cursor-pointer">
+                    </div>
+                    <button type="button" id="save-brand-btn" class="w-full py-3 mt-4 rounded-full bg-brand hover:bg-brand/80 text-white text-sm font-medium transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                        <i class="fa-solid fa-check text-xs"></i> Salvar Marca
+                    </button>
+                </form>
+            </section>
+        </div>
+
+        <!-- View: Generate Images -->
+        <div id="view-generate" class="flex-1 overflow-y-auto hidden flex-col">
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                <!-- Parameters -->
+                <section>
+                    <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider text-[11px] mb-4">Parâmetros de Geração</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-2">Cliente (Marca)</label>
+                            <!-- Brand Grid (Replaces Select Dropdown) -->
+                            <div id="client-grid" class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x">
+                                <div class="text-xs text-gray-500 italic py-2">Nenhum cliente cadastrado</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-2">Formatos (Selecione um ou mais)</label>
+                            <div class="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar pr-2" id="format-selector">
+                                <button type="button" class="format-btn active flex items-center justify-start py-2.5 px-3 rounded-lg border border-brand bg-brand/10 text-white transition-all text-sm transform active:scale-[0.98]" data-format="1:1">
+                                    <i class="fa-regular fa-square mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">1:1</span>
+                                    <span class="text-gray-400 text-xs">Quadrado</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="16:9">
+                                    <i class="fa-regular fa-rectangle-wide mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">16:9</span>
+                                    <span class="text-gray-400 text-xs">Tela panorâmica</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="9:16">
+                                    <i class="fa-regular fa-rectangle-list mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">9:16</span>
+                                    <span class="text-gray-400 text-xs">Story para mídias sociais</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="2:3">
+                                    <i class="fa-regular fa-file mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">2:3</span>
+                                    <span class="text-gray-400 text-xs">Retrato</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="3:4">
+                                    <i class="fa-regular fa-image mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">3:4</span>
+                                    <span class="text-gray-400 text-xs">Tradicional</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="1:2">
+                                    <i class="fa-solid fa-mobile-screen mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">1:2</span>
+                                    <span class="text-gray-400 text-xs">Vertical</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="2:1">
+                                    <i class="fa-solid fa-panorama mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">2:1</span>
+                                    <span class="text-gray-400 text-xs">Horizontal</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="4:5">
+                                    <i class="fa-regular fa-id-badge mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">4:5</span>
+                                    <span class="text-gray-400 text-xs">Postagem para mídias sociais</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="3:2">
+                                    <i class="fa-regular fa-window-maximize mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">3:2</span>
+                                    <span class="text-gray-400 text-xs">Padrão</span>
+                                </button>
+                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="4:3">
+                                    <i class="fa-solid fa-display mr-3 opacity-80 text-lg w-5 text-center"></i>
+                                    <span class="font-medium w-12">4:3</span>
+                                    <span class="text-gray-400 text-xs">Clássico</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Referências</label>
+                                <span class="text-xs text-gray-500">0/8</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="button" id="btn-open-styles" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
+                                    <i class="fa-solid fa-star text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-medium">Estilo</span>
+                                </button>
+                                <button type="button" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
+                                    <i class="fa-regular fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-medium">Personagem</span>
+                                </button>
+                                <button type="button" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
+                                    <i class="fa-solid fa-plus text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-medium">Adicionar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Input Area (Fixed Bottom) -->
+            <div class="p-6 border-t border-white/5 bg-surface/80 backdrop-blur-md">
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider text-[11px] mb-2">Seu Prompt</label>
+                <div class="relative group">
+                    <textarea id="prompt-input" rows="3" class="w-full bg-dark border border-white/10 rounded-xl p-4 text-sm text-white placeholder-gray-600 focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all resize-none custom-scrollbar shadow-inner" placeholder="Ex: Jogador comemorando gol, luzes de estádio, emoção..."></textarea>
+                    <div class="absolute bottom-3 right-3">
+                        <button id="generate-btn" class="w-10 h-10 rounded-full bg-brand hover:bg-brand/80 text-white flex items-center justify-center transition-all transform active:scale-95">
+                            <i class="fa-solid fa-paper-plane text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-3 text-center"><i class="fa-solid fa-shield-halved mr-1"></i> As regras do brandbook serão aplicadas automaticamente.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Canvas Area -->
+    <!-- Main Canvas Area -->
+    <main class="absolute inset-0 bg-dark flex flex-col items-center justify-center overflow-hidden z-0 pl-[480px]">
+        
+        <!-- Canvas Toolbar -->
+        <div class="absolute top-6 right-6 flex gap-2 z-20">
+            <button class="w-10 h-10 rounded-lg bg-surface/50 border border-white/10 backdrop-blur-md text-gray-400 hover:text-white transition flex items-center justify-center" title="Baixar Original"><i class="fa-solid fa-download"></i></button>
+            <button class="w-10 h-10 rounded-lg bg-surface/50 border border-white/10 backdrop-blur-md text-gray-400 hover:text-white transition flex items-center justify-center" title="Tela Cheia"><i class="fa-solid fa-expand"></i></button>
+        </div>
+
+        <!-- Result Container -->
+        <div id="result-container" class="relative w-full max-w-4xl max-h-[80vh] aspect-square flex items-center justify-center p-8">
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center transition-opacity duration-500">
+                <div class="w-24 h-24 mx-auto mb-6 rounded-2xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.02]">
+                    <i class="fa-regular fa-image text-3xl text-gray-600"></i>
+                </div>
+                <h3 class="text-3xl font-display uppercase tracking-wide text-white mb-2">Tela de Criação</h3>
+                <p class="text-sm text-gray-500 max-w-sm mx-auto">Selecione uma marca no painel ao lado, digite sua ideia e deixe a inteligência artificial criar a composição perfeita.</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="hidden absolute inset-0 flex flex-col items-center justify-center z-10 bg-dark/80 backdrop-blur-sm rounded-2xl">
+                <div class="relative w-16 h-16 mb-6">
+                    <div class="absolute inset-0 border-4 border-white/10 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-brand rounded-full border-t-transparent animate-spin"></div>
+                </div>
+                <p class="text-sm font-medium text-gray-300 animate-pulse" id="loading-text">Analisando prompt & brandbook...</p>
+            </div>
+
+            <!-- Image will be injected here -->
+        </div>
+
+        <!-- Watermark / subtle branding -->
+        <div class="absolute bottom-6 text-[10px] text-gray-600 font-medium tracking-widest uppercase">
+            Powered by Krea AI
+        </div>
+
+    </main>
+
+    <!-- Styles Modal Overlay -->
+    <div id="styles-modal" class="fixed inset-0 bg-[#000000]/80 backdrop-blur-3xl z-[100] hidden flex-col">
+        
+        <!-- Header / Nav -->
+        <div class="px-8 py-6 flex items-center justify-between border-b border-white/5 bg-surface2/50 backdrop-blur-xl">
+            <h2 class="text-2xl font-display font-bold text-white">Estilos</h2>
+            <button id="close-styles-modal" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all transform active:scale-95">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="px-8 py-4 flex items-center justify-between border-b border-white/5 bg-surface2/50 backdrop-blur-xl shrink-0">
+            <div class="flex gap-2">
+                <button class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-medium">Biblioteca</button>
+                <button class="px-5 py-2 rounded-full text-gray-400 hover:text-white text-sm font-medium">Por Magnific</button>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex gap-1 mr-4">
+                    <button class="text-xs text-white bg-white/10 px-4 py-2 rounded-full">Tudo</button>
+                    <button class="text-xs text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full">Ilustração</button>
+                    <button class="text-xs text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full">3D</button>
+                    <button class="text-xs text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full">Design</button>
+                </div>
+                <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"><i class="fa-solid fa-search"></i></button>
+                <button class="px-5 py-2.5 rounded-full bg-white text-dark font-medium text-sm flex items-center gap-2 transform active:scale-95 transition-all"><i class="fa-solid fa-plus"></i> Criar</button>
+            </div>
+        </div>
+
+        <!-- Scrollable Grid -->
+        <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-x-4 gap-y-6" id="styles-grid-content">
+                <!-- Javascript will populate this with images -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
