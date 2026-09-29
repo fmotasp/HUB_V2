@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Minimalist Dark Mode / High-end UI Styles */
 
 body {

@@ -10,6 +10,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const newBrandName = document.getElementById('new-brand-name');
     const newBrandDirection = document.getElementById('new-brand-direction');
     const newBrandFile = document.getElementById('new-brand-file');
+    const btnQuickAddBrand = document.getElementById('btn-quick-add-brand');
+    const brandSidebarContainer = document.getElementById('brand-sidebar-container');
+    const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+
+    function toggleBrandSidebar(show) {
+        if (!brandSidebarContainer) return;
+        if (show) {
+            brandSidebarContainer.classList.remove('-translate-x-[200%]');
+            brandSidebarContainer.classList.add('translate-x-0');
+        } else {
+            brandSidebarContainer.classList.add('-translate-x-[200%]');
+            brandSidebarContainer.classList.remove('translate-x-0');
+        }
+    }
+
+    if (btnCloseSidebar) {
+        btnCloseSidebar.addEventListener('click', () => toggleBrandSidebar(false));
+    }
+
+    if (btnQuickAddBrand) {
+        btnQuickAddBrand.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectEditMode('new');
+            toggleBrandSidebar(true);
+            setTimeout(() => newBrandName.focus(), 300);
+        });
+    }
 
     // Navigation
     const navCreateBrand = document.getElementById('nav-create-brand');
@@ -43,20 +70,80 @@ document.addEventListener('DOMContentLoaded', () => {
     navCreateBrand.addEventListener('click', () => setActiveNav('create'));
     navGenerate.addEventListener('click', () => setActiveNav('generate'));
 
+    // Model Selection Logic
+    const models = [
+        { id: 'krea-2/turbo', name: 'Krea 2 Turbo', desc: 'Fastest medium quality Krea 2 model.' },
+        { id: 'krea-2/large', name: 'Krea 2 Large', desc: 'Best for expressive photorealism.' },
+        { id: 'krea-2/medium', name: 'Krea 2 Medium', desc: 'Best for expressive illustrations.' }
+    ];
+    let selectedModel = models[1]; // Default Large
+
+    const modelList = document.getElementById('model-list');
+    const selectedModelLabel = document.getElementById('selected-model-label');
+
+    function renderModelList() {
+        if (!modelList) return;
+        modelList.innerHTML = '';
+        models.forEach(model => {
+            const isSelected = selectedModel.id === model.id;
+            const btn = document.createElement('button');
+            btn.className = `model-option flex items-start text-left p-2 rounded-xl transition-colors group relative ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'} w-full`;
+            btn.innerHTML = `
+                <div class="flex-1 pr-6">
+                    <h4 class="text-sm font-medium text-white mb-0.5">${model.name}</h4>
+                    <p class="text-[11px] text-gray-400 leading-tight">${model.desc}</p>
+                </div>
+                ${isSelected ? '<i class="fa-solid fa-check text-white absolute right-3 top-1/2 -translate-y-1/2 text-sm"></i>' : ''}
+            `;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectedModel = model;
+                if (selectedModelLabel) selectedModelLabel.textContent = model.name;
+                renderModelList();
+            });
+            modelList.appendChild(btn);
+        });
+    }
+    renderModelList();
+
     // Format Selection Logic
     const formatBtns = document.querySelectorAll('.format-btn');
+    const formatPreview = document.getElementById('format-preview');
+    
+    function updateFormatPreview(formatStr) {
+        if(!formatPreview) return;
+        const parts = formatStr.split(':');
+        const w = parseInt(parts[0]);
+        const h = parseInt(parts[1]);
+        
+        // Calculate max size preserving aspect ratio (max 80px)
+        const maxDim = 80;
+        let pW, pH;
+        if(w >= h) {
+            pW = maxDim;
+            pH = (h / w) * maxDim;
+        } else {
+            pH = maxDim;
+            pW = (w / h) * maxDim;
+        }
+        formatPreview.style.width = pW + 'px';
+        formatPreview.style.height = pH + 'px';
+    }
+
     formatBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const isActive = btn.classList.contains('active');
             if (isActive) {
-                // Prevent unselecting if it's the last one
                 if (document.querySelectorAll('.format-btn.active').length > 1) {
-                    btn.classList.remove('active', 'border-brand', 'bg-brand/10', 'text-white');
-                    btn.classList.add('border-transparent', 'hover:bg-white/5', 'text-gray-300');
+                    btn.classList.remove('active', 'border-2', 'border-white', 'text-white');
+                    btn.classList.add('border', 'border-white/20', 'text-gray-400');
                 }
             } else {
-                btn.classList.add('active', 'border-brand', 'bg-brand/10', 'text-white');
-                btn.classList.remove('border-transparent', 'hover:bg-white/5', 'text-gray-300');
+                btn.classList.add('active', 'border-2', 'border-white', 'text-white');
+                btn.classList.remove('border', 'border-white/20', 'text-gray-400');
+                // Update preview to newest selected shape
+                updateFormatPreview(btn.getAttribute('data-format'));
+                updateFormatLabel(btn.getAttribute('data-format'));
             }
         });
     });
@@ -86,42 +173,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    
     function createBrandTile(brandData, index, isEditGrid) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-2xl border border-white/5 bg-surface2 hover:bg-white/5 transition-all transform active:scale-95 snap-start overflow-hidden relative group';
         
         // Active logic depends on which grid it's rendering for
         const isActive = isEditGrid ? (editingBrandIndex === index) : (selectedBrandIndex === index);
         
-        if (isActive) {
-            btn.classList.add('ring-2', 'ring-brand', 'border-brand');
-        }
-
-        if (brandData && brandData.logo) {
-            const img = document.createElement('img');
-            img.src = brandData.logo;
-            img.className = 'w-full h-full object-cover';
-            btn.appendChild(img);
-        } else {
-            const icon = document.createElement('i');
-            icon.className = brandData ? 'fa-solid fa-briefcase text-2xl text-gray-400 mb-1' : 'fa-solid fa-plus text-2xl text-white mb-1';
-            btn.appendChild(icon);
+        if (isEditGrid) {
+            btn.className = 'flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-2xl border border-white/5 bg-surface2 hover:bg-white/5 transition-all transform active:scale-95 snap-start overflow-hidden relative group';
+            if (isActive) btn.classList.add('ring-2', 'ring-brand', 'ring-inset', 'border-brand');
             
-            const text = document.createElement('span');
-            text.className = 'text-[10px] text-gray-300 font-medium truncate w-full px-1 text-center absolute bottom-2';
-            text.textContent = brandData ? brandData.name : 'Novo';
-            btn.appendChild(text);
-        }
-
-        if (brandData && brandData.logo) {
-            const overlay = document.createElement('div');
-            overlay.className = 'absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity';
-            const text = document.createElement('span');
-            text.className = 'text-[10px] text-white font-medium text-center px-1';
-            text.textContent = brandData.name;
-            overlay.appendChild(text);
-            btn.appendChild(overlay);
+            if (brandData && brandData.logo) {
+                const img = document.createElement('img');
+                img.src = brandData.logo;
+                img.className = 'w-full h-full object-cover';
+                btn.appendChild(img);
+            } else {
+                const icon = document.createElement('i');
+                icon.className = brandData ? 'fa-solid fa-briefcase text-2xl text-gray-400 mb-1' : 'fa-solid fa-plus text-2xl text-white mb-1';
+                btn.appendChild(icon);
+                
+                const text = document.createElement('span');
+                text.className = 'text-[10px] text-gray-300 font-medium truncate w-full px-1 text-center absolute bottom-2';
+                text.textContent = brandData ? brandData.name : 'Novo';
+                btn.appendChild(text);
+            }
+        } else {
+            // Dropdown List Item Style
+            btn.className = 'w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl border border-transparent hover:bg-white/5 transition-all text-left';
+            if (isActive) btn.classList.add('bg-white/10');
+            
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'w-6 h-6 shrink-0 rounded flex items-center justify-center ' + (brandData && brandData.logo ? 'bg-transparent overflow-hidden' : 'bg-white/10 text-gray-400');
+            
+            if (brandData && brandData.logo) {
+                const img = document.createElement('img');
+                img.src = brandData.logo;
+                img.className = 'w-full h-full object-cover';
+                iconDiv.appendChild(img);
+            } else {
+                const icon = document.createElement('i');
+                icon.className = brandData ? 'fa-solid fa-briefcase text-xs' : 'fa-solid fa-plus text-xs';
+                iconDiv.appendChild(icon);
+            }
+            btn.appendChild(iconDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'flex flex-col flex-1 overflow-hidden';
+            
+            const title = document.createElement('span');
+            title.className = 'text-sm font-medium text-white truncate';
+            title.textContent = brandData ? brandData.name : 'Nova Marca';
+            
+            const subtitle = document.createElement('span');
+            subtitle.className = 'text-[10px] text-gray-400 truncate';
+            subtitle.textContent = brandData && brandData.direction ? brandData.direction : 'Adicionar nova marca';
+            
+            textDiv.appendChild(title);
+            textDiv.appendChild(subtitle);
+            btn.appendChild(textDiv);
+            
+            if (isActive) {
+                const check = document.createElement('i');
+                check.className = 'fa-solid fa-check text-brand text-sm';
+                btn.appendChild(check);
+            }
         }
 
         btn.addEventListener('click', () => {
@@ -130,11 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 selectedBrandIndex = index;
                 updateClientGrid();
+                const label = document.getElementById('selected-client-label');
+                if (label) label.textContent = brandData ? brandData.name : 'Sem Marca';
             }
         });
 
         return btn;
     }
+
 
     function updateClientGrid() {
         // Render Generation Grid
@@ -150,11 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render Edit Grid
         if (editBrandGrid) {
             editBrandGrid.innerHTML = '';
-            
-            // "New" Button
-            const newBtn = createBrandTile(null, 'new', true);
-            if (editingBrandIndex === 'new') newBtn.classList.add('ring-2', 'ring-brand', 'border-brand', 'bg-brand/10');
-            editBrandGrid.appendChild(newBtn);
 
             // Existing Brands
             brands.forEach((brand, index) => {
@@ -200,7 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveBrandBtn.innerHTML = '<i class="fa-solid fa-check text-xs"></i> Sucesso!';
                 setTimeout(() => {
                     saveBrandBtn.innerHTML = editingBrandIndex === 'new' ? '<i class="fa-solid fa-check text-xs"></i> Criar Marca' : '<i class="fa-solid fa-save text-xs"></i> Salvar Alterações';
-                }, 2000);
+                    toggleBrandSidebar(false);
+                }, 1000);
                 
                 if (editingBrandIndex === 'new') {
                     newBrandName.value = '';
@@ -274,46 +391,70 @@ document.addEventListener('DOMContentLoaded', () => {
     let customStyles = JSON.parse(localStorage.getItem('customStyles')) || [];
 
     function renderStylesGrid() {
-        if (!stylesGridContent) return;
-        stylesGridContent.innerHTML = '';
+        const stylePopoverGrid = document.getElementById('style-popover-grid');
+        if (stylesGridContent) stylesGridContent.innerHTML = '';
+        if (stylePopoverGrid) stylePopoverGrid.innerHTML = '';
         
         const fullList = [...customStyles, ...defaultStyles];
         
         fullList.forEach(style => {
-            const btn = document.createElement('button');
-            btn.className = 'flex flex-col gap-2 text-left group transform transition-transform active:scale-95';
             const displayImg = style.img || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=300&fit=crop&blur=100'; // fallback
             
-            btn.innerHTML = `
-                <div class="aspect-square w-full rounded-2xl overflow-hidden bg-surface2 relative border-2 border-transparent focus-within:border-brand transition-colors ring-offset-dark focus-within:ring-2 focus-within:ring-brand">
-                    <img src="${displayImg}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    ${!style.img ? `<div class="absolute inset-0 flex items-center justify-center bg-black/40"><i class="fa-solid fa-wand-magic-sparkles text-white text-2xl"></i></div>` : ''}
-                </div>
-                <span class="text-[11px] text-gray-400 font-medium px-1 truncate w-full">#${style.name}</span>
-            `;
-            
-            btn.addEventListener('click', () => {
-                selectedStyleTag = style;
-                stylesModal.classList.add('hidden');
-                stylesModal.classList.remove('flex');
+            // --- Popover List Item ---
+            if (stylePopoverGrid) {
+                const popBtn = document.createElement('button');
+                const isSelected = selectedStyleTag.name === style.name;
+                popBtn.className = `flex items-center gap-3 w-full p-2 rounded-xl transition-all ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}`;
+                popBtn.innerHTML = `
+                    <img src="${displayImg}" class="w-8 h-8 rounded-lg object-cover shrink-0">
+                    <span class="text-xs font-medium text-white flex-1 text-left truncate">#${style.name}</span>
+                    ${isSelected ? '<i class="fa-solid fa-check text-brand text-xs"></i>' : ''}
+                `;
+                popBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Evita fechar coisas ou acionar o botão principal
+                    selectedStyleTag = style;
+                    updateStyleButtonVisual(style, displayImg);
+                    renderStylesGrid(); // Re-render to update checkmarks
+                });
+                stylePopoverGrid.appendChild(popBtn);
+            }
+
+            // --- Big Modal Grid Item ---
+            if (stylesGridContent) {
+                const btn = document.createElement('button');
+                btn.className = 'flex flex-col gap-2 text-left group transform transition-transform active:scale-95';
                 
-                // Visual feedback
-                if(btnOpenStyles) {
-                    btnOpenStyles.classList.add('border-brand', 'bg-brand/10', 'text-white');
-                    btnOpenStyles.classList.remove('border-white/20', 'bg-surface', 'text-gray-400');
-                    btnOpenStyles.innerHTML = `
-                        <div class="w-full h-full rounded-2xl overflow-hidden relative">
-                            <img src="${displayImg}" class="w-full h-full object-cover opacity-60">
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <i class="fa-solid fa-check text-xl mb-1 text-white drop-shadow-md"></i>
-                                <span class="text-[10px] font-medium text-white drop-shadow-md truncate max-w-full px-1">${style.name}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            stylesGridContent.appendChild(btn);
+                btn.innerHTML = `
+                    <div class="aspect-square w-full rounded-2xl overflow-hidden bg-surface2 relative border-2 border-transparent focus-within:border-brand transition-colors ring-offset-dark focus-within:ring-2 focus-within:ring-brand">
+                        <img src="${displayImg}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        ${!style.img ? `<div class="absolute inset-0 flex items-center justify-center bg-black/40"><i class="fa-solid fa-wand-magic-sparkles text-white text-2xl"></i></div>` : ''}
+                    </div>
+                    <span class="text-[11px] text-gray-400 font-medium px-1 truncate w-full">#${style.name}</span>
+                `;
+                
+                btn.addEventListener('click', () => {
+                    selectedStyleTag = style;
+                    stylesModal.classList.add('hidden');
+                    stylesModal.classList.remove('flex');
+                    updateStyleButtonVisual(style, displayImg);
+                    renderStylesGrid(); // Re-render to update checkmarks
+                });
+                stylesGridContent.appendChild(btn);
+            }
         });
+    }
+
+    function updateStyleButtonVisual(style, displayImg) {
+        if(btnOpenStyles) {
+            btnOpenStyles.classList.add('border-brand', 'bg-brand/10', 'text-white', 'px-2');
+            btnOpenStyles.classList.remove('border-white/20', 'bg-surface', 'text-gray-400', 'px-4');
+            btnOpenStyles.innerHTML = `
+                <div class="w-7 h-7 rounded-full overflow-hidden shrink-0">
+                    <img src="${displayImg}" class="w-full h-full object-cover">
+                </div>
+                <span class="whitespace-nowrap text-sm font-medium text-white truncate max-w-[80px]">#${style.name}</span>
+            `;
+        }
     }
 
     if (btnOpenStyles && stylesModal) {
@@ -330,11 +471,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Create custom style events
+    const btnQuickAddStyle = document.getElementById('btn-quick-add-style');
+
     if (btnCreateStyle && createStyleModal) {
         btnCreateStyle.addEventListener('click', () => {
             createStyleModal.classList.remove('hidden');
             createStyleModal.classList.add('flex');
         });
+
+        if (btnQuickAddStyle) {
+            btnQuickAddStyle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                createStyleModal.classList.remove('hidden');
+                createStyleModal.classList.add('flex');
+                newStyleName.focus();
+            });
+        }
 
         closeCreateStyleModal.addEventListener('click', () => {
             createStyleModal.classList.add('hidden');
@@ -485,7 +637,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     prompt: finalPrompt,
                     formats: selectedFormats, // Send array of formats
-                    style: styleSelect
+                    style: styleSelect,
+                    model: selectedModel.id
                 })
             });
 
@@ -519,7 +672,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.src = `${baseImageUrl}&w=800&random=${Math.random() + index}`;
                 img.className = 'w-full h-full object-cover rounded-xl img-reveal';
                 
+                // Botão de remover fundo
+                const remBgBtn = document.createElement('button');
+                remBgBtn.className = 'absolute top-2 right-2 bg-black/60 backdrop-blur border border-white/20 text-white text-[10px] font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 hover:bg-brand hover:border-brand';
+                remBgBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Remover Fundo';
+                
+                // Container needs group to show button on hover
+                imgContainer.classList.add('group');
+                
+                remBgBtn.addEventListener('click', async () => {
+                    remBgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                    remBgBtn.disabled = true;
+                    try {
+                        const res = await fetch('/api/remove-bg', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ imageUrl: baseImageUrl }) // send original image url
+                        });
+                        const data = await res.json();
+                        if (data.image_base64) {
+                            img.src = data.image_base64;
+                            img.classList.replace('object-cover', 'object-contain');
+                            // Add checkerboard background to see transparency
+                            imgContainer.style.backgroundImage = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYNgBxVD8nwEPsBEI0wEI00EApsEQDkM4DEExlP///z/kQxZ7B/GzBwBf9h8Z21sNogAAAABJRU5ErkJggg==")';
+                            remBgBtn.remove(); // Remove button after success
+                        } else {
+                            throw new Error('Falha no recorte');
+                        }
+                    } catch (e) {
+                        remBgBtn.innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> Erro';
+                        setTimeout(() => {
+                            remBgBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Remover Fundo';
+                            remBgBtn.disabled = false;
+                        }, 2000);
+                    }
+                });
+
                 imgContainer.appendChild(img);
+                imgContainer.appendChild(remBgBtn);
                 resultContainer.appendChild(imgContainer);
             });
 
@@ -533,4 +723,99 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => generateBtn.innerHTML = '<i class="fa-solid fa-paper-plane text-sm"></i>', 2000);
         }
     });
+
+    // Upload & Remove BG Logic
+    const btnUploadRembg = document.getElementById('btn-upload-rembg');
+    const inputUploadRembg = document.getElementById('upload-rembg-input');
+
+    if (btnUploadRembg && inputUploadRembg) {
+        btnUploadRembg.addEventListener('click', () => {
+            inputUploadRembg.click();
+        });
+
+        inputUploadRembg.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64Str = event.target.result;
+
+                // UI loading states
+                const spinner = document.getElementById('upload-rembg-spinner');
+                const progressRing = document.getElementById('upload-rembg-progress');
+                
+                if (spinner && progressRing) {
+                    spinner.classList.remove('hidden');
+                    
+                    // Reset to 0
+                    progressRing.style.transition = 'none';
+                    progressRing.style.strokeDashoffset = '62.83';
+                    
+                    // Force reflow
+                    void progressRing.getBoundingClientRect();
+                    
+                    // Start filling smoothly to 90%
+                    progressRing.style.transition = 'stroke-dashoffset 15s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                    progressRing.style.strokeDashoffset = '6.28';
+                }
+                
+                btnUploadRembg.classList.add('opacity-50', 'pointer-events-none');
+
+                emptyState.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                const loadingText = document.getElementById('loading-text');
+                if(loadingText) loadingText.textContent = "Removendo fundo (Upload)...";
+                resultContainer.innerHTML = '';
+
+                try {
+                    const res = await fetch('/api/remove-bg', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ imageBase64: base64Str })
+                    });
+                    
+                    const data = await res.json();
+                    if (!res.ok || !data.image_base64) throw new Error('Falha no recorte');
+
+                    loadingState.classList.add('hidden');
+
+                    // Render result
+                    resultContainer.className = 'relative w-full h-full flex flex-wrap items-center justify-center p-8 gap-8 overflow-y-auto custom-scrollbar content-center';
+                    
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'img-container relative inline-flex shadow-2xl rounded-xl ring-1 ring-white/10 max-h-[80vh]';
+                    imgContainer.style.backgroundImage = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYNgBxVD8nwEPsBEI0wEI00EApsEQDkM4DEExlP///z/kQxZ7B/GzBwBf9h8Z21sNogAAAABJRU5ErkJggg==")';
+
+                    const img = document.createElement('img');
+                    img.src = data.image_base64;
+                    img.className = 'w-auto max-w-full h-auto max-h-[80vh] object-contain rounded-xl img-reveal';
+                    
+                    imgContainer.appendChild(img);
+                    resultContainer.appendChild(imgContainer);
+
+                    // Complete animation
+                    if (progressRing) {
+                        progressRing.style.transition = 'stroke-dashoffset 0.5s ease-out';
+                        progressRing.style.strokeDashoffset = '0';
+                    }
+
+                } catch (err) {
+                    console.error("Erro upload rembg:", err);
+                    loadingState.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    alert("Erro ao remover o fundo da imagem enviada.");
+                } finally {
+                    setTimeout(() => {
+                        if (spinner) spinner.classList.add('hidden');
+                        btnUploadRembg.classList.remove('opacity-50', 'pointer-events-none');
+                    }, 500);
+                }
+                
+                // reset input
+                inputUploadRembg.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 });

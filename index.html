@@ -4,43 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brand AI Hub | Workspace</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        dark: '#000000',      // Apple True Black
-                        surface: '#151515',   // Apple Dark Grey
-                        surface2: '#1d1d1f',  // Lighter Dark Grey
-                        brand: '#2997ff',     // Apple Blue (Dark mode friendly)
-                        greencta: '#2997ff',  // Replacing green with blue (Apple only uses one accent)
-                    },
-                    fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Helvetica Neue"', 'sans-serif'],
-                        display: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Helvetica Neue"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <!-- Compiled Tailwind & Custom CSS -->
+    <link rel="stylesheet" href="output.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-dark text-gray-100 font-sans h-screen flex overflow-hidden relative">
     
     <!-- Floating Left Panel -->
-    <div class="absolute left-6 top-6 bottom-6 flex rounded-3xl overflow-hidden shadow-2xl border border-white/10 z-20">
+    <div id="brand-sidebar-container" class="absolute left-6 top-6 bottom-6 flex rounded-3xl overflow-hidden shadow-2xl border border-white/10 z-[120] transform -translate-x-[200%] transition-transform duration-500 ease-in-out">
 
         <!-- Left Sidebar: Controls -->
-        <aside class="w-[400px] bg-[#151515]/80 backdrop-blur-3xl flex flex-col h-full shrink-0">
+        <aside class="w-[400px] bg-[#151515]/90 backdrop-blur-3xl flex flex-col h-full shrink-0 relative">
+            <button id="btn-close-sidebar" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all transform active:scale-95 z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         
         <!-- Header -->
         <div class="px-6 pt-6 pb-4 border-b border-white/5 flex flex-col gap-4">
             <div class="flex items-center justify-between w-full">
-                <div class="flex bg-black/40 p-1 rounded-xl gap-1 w-full max-w-[260px]">
+                <div class="flex bg-black/40 p-1 rounded-xl gap-1 w-full max-w-[260px] opacity-0 pointer-events-none hidden">
                     <button id="nav-create-brand" class="flex-1 px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-medium transition flex items-center justify-center gap-2 transform active:scale-95">
                         <i class="fa-solid fa-folder-plus"></i> Marca
                     </button>
@@ -92,185 +77,227 @@
         </div>
 
         <!-- View: Generate Images -->
-        <div id="view-generate" class="flex-1 overflow-y-auto hidden flex-col">
-            <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
-                <!-- Parameters -->
-                <section>
-                    <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider text-[11px] mb-4">Parâmetros de Geração</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-2">Cliente (Marca)</label>
-                            <!-- Brand Grid (Replaces Select Dropdown) -->
-                            <div id="client-grid" class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x">
-                                <div class="text-xs text-gray-500 italic py-2">Nenhum cliente cadastrado</div>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-2">Formatos (Selecione um ou mais)</label>
-                            <div class="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar pr-2" id="format-selector">
-                                <button type="button" class="format-btn active flex items-center justify-start py-2.5 px-3 rounded-lg border border-brand bg-brand/10 text-white transition-all text-sm transform active:scale-[0.98]" data-format="1:1">
-                                    <i class="fa-regular fa-square mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">1:1</span>
-                                    <span class="text-gray-400 text-xs">Quadrado</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="16:9">
-                                    <i class="fa-regular fa-rectangle-wide mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">16:9</span>
-                                    <span class="text-gray-400 text-xs">Tela panorâmica</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="9:16">
-                                    <i class="fa-regular fa-rectangle-list mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">9:16</span>
-                                    <span class="text-gray-400 text-xs">Story para mídias sociais</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="2:3">
-                                    <i class="fa-regular fa-file mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">2:3</span>
-                                    <span class="text-gray-400 text-xs">Retrato</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="3:4">
-                                    <i class="fa-regular fa-image mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">3:4</span>
-                                    <span class="text-gray-400 text-xs">Tradicional</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="1:2">
-                                    <i class="fa-solid fa-mobile-screen mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">1:2</span>
-                                    <span class="text-gray-400 text-xs">Vertical</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="2:1">
-                                    <i class="fa-solid fa-panorama mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">2:1</span>
-                                    <span class="text-gray-400 text-xs">Horizontal</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="4:5">
-                                    <i class="fa-regular fa-id-badge mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">4:5</span>
-                                    <span class="text-gray-400 text-xs">Postagem para mídias sociais</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="3:2">
-                                    <i class="fa-regular fa-window-maximize mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">3:2</span>
-                                    <span class="text-gray-400 text-xs">Padrão</span>
-                                </button>
-                                <button type="button" class="format-btn flex items-center justify-start py-2.5 px-3 rounded-lg border border-transparent hover:bg-white/5 text-gray-300 hover:text-white transition-all text-sm transform active:scale-[0.98]" data-format="4:3">
-                                    <i class="fa-solid fa-display mr-3 opacity-80 text-lg w-5 text-center"></i>
-                                    <span class="font-medium w-12">4:3</span>
-                                    <span class="text-gray-400 text-xs">Clássico</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <div class="flex items-center justify-between mb-3">
-                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Referências</label>
-                                <span class="text-xs text-gray-500">0/8</span>
-                            </div>
-                            <div class="flex gap-3">
-                                <button type="button" id="btn-open-styles" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
-                                    <i class="fa-solid fa-star text-xl mb-1 group-hover:scale-110 transition-transform"></i>
-                                    <span class="text-[10px] font-medium">Estilo</span>
-                                </button>
-                                <button type="button" id="btn-open-character" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
-                                    <i class="fa-regular fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
-                                    <span class="text-[10px] font-medium">Personagem</span>
-                                </button>
-                                <button type="button" class="w-20 h-20 rounded-2xl border border-dashed border-white/20 bg-surface hover:bg-white/5 flex flex-col items-center justify-center text-gray-400 hover:text-white transition-all transform active:scale-95 group">
-                                    <i class="fa-solid fa-plus text-xl mb-1 group-hover:scale-110 transition-transform"></i>
-                                    <span class="text-[10px] font-medium">Adicionar</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 3D Camera Angle Control -->
-                        <div class="mt-6">
-                            <div class="flex items-center justify-between mb-3">
-                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Ângulo da Câmera 3D</label>
-                                <div class="flex flex-col items-end">
-                                    <span id="camera-angle-value-y" class="text-[10px] text-brand font-medium">Vertical: 0°</span>
-                                    <span id="camera-angle-value-x" class="text-[10px] text-brand font-medium">Lateral: 0°</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-4 p-4 bg-surface2/50 rounded-xl border border-white/5">
-                                <div class="flex gap-4 items-center justify-between">
-                                    <div class="relative w-16 h-16 flex items-center justify-center shrink-0" style="perspective: 300px;">
-                                        <div id="camera-cube" class="relative w-10 h-10 transition-transform duration-100 ease-out" style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg);">
-                                            <!-- Frente (Lente) -->
-                                            <div class="absolute inset-0 bg-[#1a1a1a] border-2 border-brand rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(41,151,255,0.3)]" style="transform: translateZ(20px);">
-                                                <div class="w-5 h-5 rounded-full border-2 border-brand/80 bg-black flex items-center justify-center">
-                                                    <div class="w-1.5 h-1.5 rounded-full bg-brand/50"></div>
-                                                </div>
-                                            </div>
-                                            <!-- Atrás -->
-                                            <div class="absolute inset-0 bg-[#151515] border border-white/20 rounded-lg flex items-center justify-center" style="transform: rotateY(180deg) translateZ(20px);">
-                                                <div class="w-6 h-4 bg-white/5 rounded-sm"></div>
-                                            </div>
-                                            <!-- Direita -->
-                                            <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(90deg) translateZ(20px);"></div>
-                                            <!-- Esquerda -->
-                                            <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(-90deg) translateZ(20px);"></div>
-                                            <!-- Topo -->
-                                            <div class="absolute inset-0 bg-[#1e1e1e] border border-white/20 rounded-lg flex items-start justify-end p-1" style="transform: rotateX(90deg) translateZ(20px);">
-                                                <div class="w-2 h-1 bg-red-500 rounded-full"></div>
-                                            </div>
-                                            <!-- Fundo -->
-                                            <div class="absolute inset-0 bg-[#0a0a0a] border border-white/5 rounded-lg" style="transform: rotateX(-90deg) translateZ(20px);"></div>
-                                        </div>
-                                    </div>
-                                    <!-- Vertical Slider -->
-                                    <div class="flex-1 flex items-center justify-center relative h-24">
-                                        <input type="range" id="camera-angle-range-y" min="-90" max="90" value="0" step="1" 
-                                               class="absolute w-24 h-1.5 bg-dark/50 rounded-lg appearance-none cursor-pointer outline-none focus:ring-1 focus:ring-brand
-                                               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-                                               [&::-webkit-slider-thumb]:bg-brand [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg" 
-                                               style="transform: rotate(270deg);">
-                                    </div>
-                                    <div class="flex flex-col justify-between h-24 text-[10px] text-gray-500 font-medium py-1 text-right shrink-0">
-                                        <span>Top</span>
-                                        <span>Front</span>
-                                        <span>Bottom</span>
-                                    </div>
-                                </div>
-                                <!-- Horizontal Slider -->
-                                <div class="flex gap-3 items-center justify-between mt-1 pt-4 border-t border-white/5">
-                                    <span class="text-[10px] text-gray-500 font-medium w-12 text-right">Esquerda</span>
-                                    <input type="range" id="camera-angle-range-x" min="-90" max="90" value="0" step="1" 
-                                           class="flex-1 h-1.5 bg-dark/50 rounded-lg appearance-none cursor-pointer outline-none focus:ring-1 focus:ring-brand
-                                           [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-                                           [&::-webkit-slider-thumb]:bg-brand [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg">
-                                    <span class="text-[10px] text-gray-500 font-medium w-12">Direita</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Input Area (Fixed Bottom) -->
-            <div class="p-6 border-t border-white/5 bg-surface/80 backdrop-blur-md">
-                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider text-[11px] mb-2">Seu Prompt</label>
-                <div class="relative group">
-                    <textarea id="prompt-input" rows="3" class="w-full bg-dark border border-white/10 rounded-xl p-4 text-sm text-white placeholder-gray-600 focus:ring-1 focus:ring-brand focus:border-brand outline-none transition-all resize-none custom-scrollbar shadow-inner" placeholder="Ex: Jogador comemorando gol, luzes de estádio, emoção..."></textarea>
-                    <div class="absolute bottom-3 right-3">
-                        <button id="generate-btn" class="w-10 h-10 rounded-full bg-brand hover:bg-brand/80 text-white flex items-center justify-center transition-all transform active:scale-95">
-                            <i class="fa-solid fa-paper-plane text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-                <p class="text-[10px] text-gray-500 mt-3 text-center"><i class="fa-solid fa-shield-halved mr-1"></i> As regras do brandbook serão aplicadas automaticamente.</p>
-            </div>
+        <div id="view-generate" class="flex-1 overflow-y-auto hidden flex-col items-center justify-center p-6 text-center">
+            <i class="fa-solid fa-wand-magic-sparkles text-3xl text-white/20 mb-4"></i>
+            <p class="text-sm text-gray-500">Utilize a barra flutuante abaixo para configurar a geração de imagens.</p>
         </div>
     </aside>
     </div>
 
     <!-- Main Canvas Area -->
-    <main class="absolute inset-0 bg-dark flex flex-col items-center justify-center overflow-hidden z-0 pl-[520px]">
+    <main class="absolute inset-0 bg-dark flex flex-col items-center justify-center overflow-hidden z-0">
         
-        <!-- Canvas Toolbar -->
-        <div class="absolute top-6 right-6 flex gap-2 z-20">
+        
+    
+    <!-- Floating Prompt Bar (Bottom Center) -->
+    <div class="absolute bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none px-8">
+        <div class="bg-[#151515] border border-white/10 rounded-3xl p-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-3 w-full max-w-4xl pointer-events-auto backdrop-blur-2xl transition-all">
+            <textarea id="prompt-input" rows="1" class="w-full bg-transparent border-0 text-white placeholder-gray-500 outline-none px-3 pt-2 text-[15px] resize-none overflow-y-auto custom-scrollbar" style="min-height: 44px; max-height: 240px;" placeholder="O que vamos gerar hoje?" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 240) + 'px'"></textarea>
+            <div class="flex items-center gap-3 w-full">
+            
+            <!-- Model Popover Group -->
+            <div class="relative group/model flex items-center shrink-0">
+                <button id="btn-open-model" class="h-11 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center transition-all transform active:scale-95 w-auto px-4 gap-2">
+                    <i class="fa-solid fa-microchip opacity-70 shrink-0"></i>
+                    <span id="selected-model-label" class="whitespace-nowrap text-sm font-medium text-gray-200">Krea 2 Large</span>
+                </button>
+                <div class="absolute bottom-full left-0 mb-3 hidden group-hover/model:flex flex-col bg-[#1f1f1f] border border-white/10 rounded-2xl p-2 shadow-2xl w-[280px] origin-bottom-left animate-in fade-in zoom-in-95 duration-200 z-50 after:content-[''] after:absolute after:-bottom-4 after:left-0 after:w-full after:h-4">
+                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-2 flex items-center justify-between border-b border-white/5 mb-2">
+                        Search models...
+                    </div>
+                    <div id="model-list" class="flex flex-col gap-1 max-h-80 overflow-y-auto custom-scrollbar">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Popover Group -->
+            <div class="relative group/client flex items-center shrink-0">
+                <button id="btn-open-clients" class="h-11 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center transition-all transform active:scale-95 w-auto px-4 gap-2">
+                    <i class="fa-solid fa-briefcase opacity-70 shrink-0"></i>
+                    <span class="whitespace-nowrap text-sm font-medium text-gray-200">Marca</span>
+                </button>
+                <div class="absolute bottom-full left-0 mb-3 hidden group-hover/client:flex flex-col bg-[#1f1f1f] border border-white/10 rounded-2xl p-2 shadow-2xl w-64 origin-bottom-left animate-in fade-in zoom-in-95 duration-200 after:content-[''] after:absolute after:-bottom-4 after:left-0 after:w-full after:h-4">
+                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-2 flex items-center justify-between">
+                        Cliente (Marca)
+                        <button id="btn-quick-add-brand" class="w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-white">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="client-grid" class="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar"></div>
+                </div>
+            </div>
+            
+            <!-- Format Popover Group -->
+            <div class="relative group/format flex items-center shrink-0">
+                <button id="btn-open-formats" class="h-11 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center transition-all transform active:scale-95 w-auto px-4 gap-2">
+                    <i class="fa-regular fa-square opacity-70 shrink-0"></i>
+                    <span class="whitespace-nowrap text-sm font-medium text-gray-200">Formato</span>
+                </button>
+                <div class="absolute bottom-full left-0 mb-3 hidden group-hover/format:flex flex-col bg-[#1f1f1f] border border-white/10 rounded-2xl p-2 shadow-2xl w-72 origin-bottom-left animate-in fade-in zoom-in-95 duration-200 after:content-[''] after:absolute after:-bottom-4 after:left-0 after:w-full after:h-4">
+                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-2">Proporção</div>
+                    
+        <div class="p-3 flex flex-col gap-3" id="format-selector">
+            <div class="grid grid-cols-4 gap-2">
+                <button type="button" class="format-btn active flex items-center justify-center rounded-lg border-2 border-white text-white text-[10px] font-medium transition-all hover:bg-white/10 aspect-square" data-format="1:1">1:1</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[4/3]" data-format="4:3">4:3</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[3/2]" data-format="3:2">3:2</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-video" data-format="16:9">16:9</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[3/4]" data-format="3:4">3:4</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[2/3]" data-format="2:3">2:3</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[9/16]" data-format="9:16">9:16</button>
+                <button type="button" class="format-btn flex items-center justify-center rounded border border-white/20 text-gray-400 text-[10px] font-medium transition-all hover:bg-white/10 aspect-[4/5]" data-format="4:5">4:5</button>
+            </div>
+            <!-- Preview Box (Big Grid) -->
+            <div class="w-full h-24 border border-white/10 rounded-xl bg-black/40 flex items-center justify-center">
+                <div id="format-preview" class="w-12 h-12 border-2 border-white rounded-lg flex items-center justify-center transition-all duration-300 relative overflow-hidden shrink-0">
+                    <div class="absolute inset-0 flex flex-col justify-evenly"><div class="w-full h-[1px] bg-white/20"></div><div class="w-full h-[1px] bg-white/20"></div></div>
+                    <div class="absolute inset-0 flex flex-row justify-evenly"><div class="h-full w-[1px] bg-white/20"></div><div class="h-full w-[1px] bg-white/20"></div></div>
+                </div>
+            </div>
+        </div>
+
+                </div>
+            </div>
+
+            <!-- Styles Popover Group -->
+            <div class="relative group/style flex items-center shrink-0">
+                <button id="btn-open-styles" class="h-11 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center transition-all transform active:scale-95 w-auto px-4 gap-2">
+                    <i class="fa-solid fa-star opacity-70 shrink-0"></i>
+                    <span class="whitespace-nowrap text-sm font-medium text-gray-200">Estilo</span>
+                </button>
+                <div class="absolute bottom-full left-0 mb-3 hidden group-hover/style:flex flex-col bg-[#1f1f1f] border border-white/10 rounded-2xl p-2 shadow-2xl w-64 origin-bottom-left animate-in fade-in zoom-in-95 duration-200 z-50 after:content-[''] after:absolute after:-bottom-4 after:left-0 after:w-full after:h-4">
+                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-2 flex items-center justify-between">
+                        Estilos
+                        <button id="btn-quick-add-style" class="w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-white">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="style-popover-grid" class="flex flex-col gap-1 max-h-60 overflow-y-auto custom-scrollbar">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group/character flex items-center shrink-0">
+                
+            <div class="relative group/reference flex items-center shrink-0">
+                <button id="btn-open-reference" class="h-11 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white flex items-center justify-center transition-all transform active:scale-95 w-auto px-4 gap-2">
+                    <i class="fa-regular fa-image opacity-70 shrink-0"></i>
+                    <span class="whitespace-nowrap text-sm font-medium text-gray-200">Referência</span>
+                </button>
+                <div class="absolute bottom-full left-0 mb-3 hidden group-hover/reference:flex flex-col bg-[#1f1f1f] border border-white/10 rounded-2xl p-4 shadow-2xl w-64 origin-bottom-left animate-in fade-in zoom-in-95 duration-200 after:content-[''] after:absolute after:-bottom-4 after:left-0 after:w-full after:h-4">
+                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Imagens de Referência</div>
+                    <div class="border-2 border-dashed border-white/10 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-white/30 hover:bg-white/5 transition-all" onclick="document.getElementById('reference-upload-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up text-xl text-gray-500 mb-2"></i>
+                        <span class="text-xs text-gray-400 font-medium">Clique ou arraste imagens aqui</span>
+                    </div>
+                    <input type="file" id="reference-upload-input" accept="image/*" multiple class="hidden">
+                </div>
+            </div>
+
+            </div>
+
+            
+
+            <div class="flex-1"></div>
+            
+            <input type="file" id="upload-rembg-input" accept="image/*" class="hidden">
+            
+            <div class="relative shrink-0 flex items-center justify-center w-10 h-10 ml-2">
+                <!-- SVG Progress Ring (Hidden by default) -->
+                <svg id="upload-rembg-spinner" class="absolute -inset-1 w-12 h-12 text-brand hidden pointer-events-none transform -rotate-90 drop-shadow-[0_0_10px_rgba(0,122,255,0.5)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <circle id="upload-rembg-progress" class="transition-all ease-out" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" stroke-dasharray="62.83" stroke-dashoffset="62.83" stroke-linecap="round"></circle>
+                </svg>
+                
+                <button id="btn-upload-rembg" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all transform active:scale-95 group relative" title="Remover Fundo da Imagem">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                    <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/80 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Remover Fundo</div>
+                </button>
+            </div>
+
+
+            <button id="generate-btn" class="w-10 h-10 shrink-0 rounded-full bg-brand text-white flex items-center justify-center hover:bg-brandHover transition-all shadow-lg transform active:scale-95 ml-2">
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            </div>
+        </div>
+    </div>
+    <!-- Canvas Toolbar -->
+
+    <!-- Canvas Toolbar and 3D Camera Floating Group (Right Center) -->
+    <div class="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4 z-20">
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-2">
             <button class="w-10 h-10 rounded-lg bg-surface/50 border border-white/10 backdrop-blur-md text-gray-400 hover:text-white transition flex items-center justify-center" title="Baixar Original"><i class="fa-solid fa-download"></i></button>
             <button class="w-10 h-10 rounded-lg bg-surface/50 border border-white/10 backdrop-blur-md text-gray-400 hover:text-white transition flex items-center justify-center" title="Tela Cheia"><i class="fa-solid fa-expand"></i></button>
         </div>
+
+        <!-- 3D Camera Floating Panel -->
+        <div id="floating-camera-panel" class="bg-[#151515]/60 backdrop-blur-3xl border border-white/10 rounded-3xl p-6 shadow-2xl w-[360px] animate-in slide-in-from-right-8 duration-300">
+            <div class="mt-0">
+                <div class="flex items-center justify-between mb-5">
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-cube opacity-50 mr-2"></i> Ângulo 3D</label>
+                    <div class="flex flex-col items-end">
+                        <span id="camera-angle-value-y" class="text-[10px] text-brand font-medium">Vertical: 0°</span>
+                        <span id="camera-angle-value-x" class="text-[10px] text-brand font-medium">Lateral: 0°</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-6 pt-2">
+                    <div class="flex gap-4 items-center justify-between">
+                        <div class="relative w-16 h-16 flex items-center justify-center shrink-0" style="perspective: 300px;">
+                            <div id="camera-cube" class="relative w-10 h-10 transition-transform duration-100 ease-out" style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg);">
+                                <!-- Frente (Lente) -->
+                                <div class="absolute inset-0 bg-[#1a1a1a] border-2 border-brand rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(41,151,255,0.3)]" style="transform: translateZ(20px);">
+                                    <div class="w-5 h-5 rounded-full border-2 border-brand/80 bg-black flex items-center justify-center">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-brand/50"></div>
+                                    </div>
+                                </div>
+                                <!-- Atrás -->
+                                <div class="absolute inset-0 bg-[#151515] border border-white/20 rounded-lg flex items-center justify-center" style="transform: rotateY(180deg) translateZ(20px);">
+                                    <div class="w-6 h-4 bg-white/5 rounded-sm"></div>
+                                </div>
+                                <!-- Direita -->
+                                <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(90deg) translateZ(20px);"></div>
+                                <!-- Esquerda -->
+                                <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(-90deg) translateZ(20px);"></div>
+                                <!-- Topo -->
+                                <div class="absolute inset-0 bg-[#1e1e1e] border border-white/20 rounded-lg flex items-start justify-end p-1" style="transform: rotateX(90deg) translateZ(20px);">
+                                    <div class="w-2 h-1 bg-red-500 rounded-full"></div>
+                                </div>
+                                <!-- Fundo -->
+                                <div class="absolute inset-0 bg-[#0a0a0a] border border-white/5 rounded-lg" style="transform: rotateX(-90deg) translateZ(20px);"></div>
+                            </div>
+                        </div>
+                        <!-- Vertical Slider -->
+                        <div class="flex-1 flex items-center justify-center relative h-24">
+                            <input type="range" id="camera-angle-range-y" min="-90" max="90" value="0" step="1" 
+                                    class="absolute w-24 h-1.5 bg-dark/50 rounded-lg appearance-none cursor-pointer outline-none focus:ring-1 focus:ring-brand
+                                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+                                    [&::-webkit-slider-thumb]:bg-brand [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg" 
+                                    style="transform: rotate(270deg);">
+                        </div>
+                        <div class="flex flex-col justify-between h-24 text-[10px] text-gray-500 font-medium py-1 text-right shrink-0">
+                            <span>Top</span>
+                            <span>Front</span>
+                            <span>Bottom</span>
+                        </div>
+                    </div>
+                    <!-- Horizontal Slider -->
+                    <div class="flex gap-4 items-center justify-between mt-2 pt-5 border-t border-white/5">
+                        <span class="text-[10px] text-gray-500 font-medium w-12 text-right">Esquerda</span>
+                        <input type="range" id="camera-angle-range-x" min="-90" max="90" value="0" step="1" 
+                                class="flex-1 h-1.5 bg-dark/50 rounded-lg appearance-none cursor-pointer outline-none focus:ring-1 focus:ring-brand
+                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
+                                [&::-webkit-slider-thumb]:bg-brand [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg">
+                        <span class="text-[10px] text-gray-500 font-medium w-12">Direita</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
         <!-- Result Container -->
         <div id="result-container" class="relative w-full max-w-4xl max-h-[80vh] aspect-square flex items-center justify-center p-8">
@@ -327,7 +354,7 @@
                     <button class="text-xs text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full">Design</button>
                 </div>
                 <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"><i class="fa-solid fa-search"></i></button>
-                <button id="btn-create-style" class="px-5 py-2.5 rounded-full bg-white text-dark font-medium text-sm flex items-center gap-2 transform active:scale-95 transition-all"><i class="fa-solid fa-plus"></i> Criar</button>
+                <button id="btn-create-style" class="px-5 py-2.5 rounded-full bg-white text-dark font-medium text-sm flex items-center transform active:scale-95 transition-all"><i class="fa-solid fa-plus"></i> Criar</button>
             </div>
         </div>
 
