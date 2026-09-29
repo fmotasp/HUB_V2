@@ -176,10 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = newBrandName.value;
         const direction = newBrandDirection.value;
         const logoFile = newBrandLogo ? newBrandLogo.files[0] : null;
+        const file = newBrandFile ? newBrandFile.files[0] : null;
+        const brandbookName = file ? file.name : null;
         
         if (name) {
             const saveBrand = (logoBase64 = null) => {
                 const brandData = { name, direction };
+                if (brandbookName) brandData.brandbook = brandbookName;
                 
                 if (editingBrandIndex === 'new') {
                     if (logoBase64) brandData.logo = logoBase64;
@@ -187,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const idx = parseInt(editingBrandIndex);
                     brandData.logo = logoBase64 || brands[idx].logo;
+                    if (!brandbookName && brands[idx].brandbook) brandData.brandbook = brands[idx].brandbook;
                     brands[idx] = brandData;
                 }
                 
@@ -230,6 +234,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const newStyleDirection = document.getElementById('new-style-direction');
 
     let selectedStyleTag = { name: "realistic", prompt: "realistic" };
+    let characterReference = "";
+    
+    const btnOpenCharacter = document.getElementById('btn-open-character');
+    if (btnOpenCharacter) {
+        btnOpenCharacter.addEventListener('click', () => {
+            const charRef = prompt("Descreva o Personagem (ex: homem jovem com jaqueta preta):", characterReference);
+            if (charRef !== null) {
+                characterReference = charRef;
+                if (charRef.trim() !== "") {
+                    btnOpenCharacter.classList.add('border-brand', 'bg-brand/10', 'text-white');
+                    btnOpenCharacter.classList.remove('border-white/20', 'bg-surface', 'text-gray-400');
+                    btnOpenCharacter.innerHTML = `
+                        <i class="fa-solid fa-check text-xl mb-1 text-brand"></i>
+                        <span class="text-[10px] font-medium truncate w-full px-1 text-center">Salvo</span>
+                    `;
+                } else {
+                    btnOpenCharacter.classList.remove('border-brand', 'bg-brand/10', 'text-white');
+                    btnOpenCharacter.classList.add('border-white/20', 'bg-surface', 'text-gray-400');
+                    btnOpenCharacter.innerHTML = `
+                        <i class="fa-regular fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-medium">Personagem</span>
+                    `;
+                }
+            }
+        });
+    }
 
     const defaultStyles = [
         { name: "photo", prompt: "photorealistic, hyperrealistic, 85mm lens", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop" },
@@ -333,6 +363,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Camera Angle Logic
+    const cameraAngleRangeY = document.getElementById('camera-angle-range-y');
+    const cameraAngleRangeX = document.getElementById('camera-angle-range-x');
+    const cameraAngleValueY = document.getElementById('camera-angle-value-y');
+    const cameraAngleValueX = document.getElementById('camera-angle-value-x');
+    const cameraCube = document.getElementById('camera-cube');
+
+    function updateCameraCube() {
+        if (!cameraCube) return;
+        const valY = cameraAngleRangeY ? parseInt(cameraAngleRangeY.value) : 0;
+        const valX = cameraAngleRangeX ? parseInt(cameraAngleRangeX.value) : 0;
+        cameraCube.style.transform = `rotateX(${valY}deg) rotateY(${valX}deg)`;
+    }
+
+    if (cameraAngleRangeY && cameraAngleValueY) {
+        cameraAngleRangeY.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            let label = "Frontal";
+            if (val >= 20 && val < 80) label = "High Angle";
+            else if (val >= 80) label = "Top Down";
+            else if (val <= -20 && val > -80) label = "Low Angle";
+            else if (val <= -80) label = "Worm's Eye";
+            cameraAngleValueY.textContent = `Vertical: ${val}° (${label})`;
+            updateCameraCube();
+        });
+    }
+
+    if (cameraAngleRangeX && cameraAngleValueX) {
+        cameraAngleRangeX.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            let label = "Centro";
+            if (val >= 20 && val < 80) label = "Direita";
+            else if (val >= 80) label = "Perfil Direito";
+            else if (val <= -20 && val > -80) label = "Esquerda";
+            else if (val <= -80) label = "Perfil Esquerdo";
+            cameraAngleValueX.textContent = `Lateral: ${val}° (${label})`;
+            updateCameraCube();
+        });
+    }
+
     const loadingPhrases = [
         "Analisando prompt & brandbook...",
         "Aplicando color grading da marca...",
@@ -346,10 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let currentBrand = "Sem Marca";
         let brandStyle = "";
+        let brandbookAttached = "";
 
         if (selectedBrandIndex !== null && brands[selectedBrandIndex]) {
             currentBrand = brands[selectedBrandIndex].name;
-            brandStyle = brands[selectedBrandIndex].direction;
+            brandStyle = brands[selectedBrandIndex].direction || "";
+            if (brands[selectedBrandIndex].brandbook) {
+                brandbookAttached = ` (Brandbook Reference: ${brands[selectedBrandIndex].brandbook})`;
+            }
         }
 
         const styleSelect = selectedStyleTag.prompt; // Use the actual prompt direction
@@ -373,7 +447,33 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingText.textContent = loadingPhrases[phraseIndex];
         }, 1500);
 
-        const finalPrompt = `${promptInput}. ${brandStyle}. Style: ${styleSelect}. Masterpiece, 8k, highly detailed.`;
+        let cameraPromptY = "eye level shot";
+        let cameraPromptX = "frontal view";
+        
+        if (cameraAngleRangeY) {
+            const valY = parseInt(cameraAngleRangeY.value);
+            if (valY >= 20 && valY < 80) cameraPromptY = "high angle shot, looking down";
+            else if (valY >= 80) cameraPromptY = "top down shot, bird's eye view";
+            else if (valY <= -20 && valY > -80) cameraPromptY = "low angle shot, looking up";
+            else if (valY <= -80) cameraPromptY = "worm's eye view, extreme low angle";
+        }
+        
+        if (cameraAngleRangeX) {
+            const valX = parseInt(cameraAngleRangeX.value);
+            if (valX >= 20 && valX < 80) cameraPromptX = "shot from the right side";
+            else if (valX >= 80) cameraPromptX = "profile shot from the right";
+            else if (valX <= -20 && valX > -80) cameraPromptX = "shot from the left side";
+            else if (valX <= -80) cameraPromptX = "profile shot from the left";
+        }
+
+        let characterPrompt = "";
+        if (typeof characterReference !== 'undefined' && characterReference.trim() !== "") {
+            characterPrompt = ` Character Reference: ${characterReference}.`;
+        }
+
+        const cameraPrompt = ` Camera Angle: ${cameraPromptY}, ${cameraPromptX}.`;
+
+        const finalPrompt = `Subject: ${promptInput}. Brand Direction: ${brandStyle}${brandbookAttached}.${characterPrompt}${cameraPrompt} Style: ${styleSelect}. Masterpiece, 8k, highly detailed.`;
         console.log(`[Frontend] Enviando para Backend Ponte: ${finalPrompt}`);
 
         try {
