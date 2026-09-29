@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setActiveNav(activeId) {
         if (activeId === 'create') {
-            navCreateBrand.className = 'w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center transition group relative';
-            navGenerate.className = 'w-12 h-12 rounded-xl text-gray-500 flex items-center justify-center hover:text-white hover:bg-white/5 transition group relative';
+            navCreateBrand.className = 'flex-1 px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-medium transition flex items-center justify-center gap-2 transform active:scale-95';
+            navGenerate.className = 'flex-1 px-4 py-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 text-xs font-medium transition flex items-center justify-center gap-2 transform active:scale-95';
             
             viewCreateBrand.classList.remove('hidden');
             viewCreateBrand.classList.add('block');
@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
             viewGenerate.classList.remove('flex');
             sidebarTitle.textContent = "Nova Marca";
         } else {
-            navGenerate.className = 'w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center transition group relative';
-            navCreateBrand.className = 'w-12 h-12 rounded-xl text-gray-500 flex items-center justify-center hover:text-white hover:bg-white/5 transition group relative';
+            navGenerate.className = 'flex-1 px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-medium transition flex items-center justify-center gap-2 transform active:scale-95';
+            navCreateBrand.className = 'flex-1 px-4 py-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 text-xs font-medium transition flex items-center justify-center gap-2 transform active:scale-95';
             
             viewCreateBrand.classList.add('hidden');
             viewCreateBrand.classList.remove('block');
