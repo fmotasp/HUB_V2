@@ -197,9 +197,28 @@
                             </div>
                             <div class="flex flex-col gap-4 p-4 bg-surface2/50 rounded-xl border border-white/5">
                                 <div class="flex gap-4 items-center justify-between">
-                                    <div class="relative w-16 h-16 flex items-center justify-center shrink-0" style="perspective: 200px;">
-                                        <div id="camera-cube" class="w-10 h-10 border-2 border-brand/50 bg-brand/10 rounded-lg flex items-center justify-center transition-transform duration-100 ease-out" style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg);">
-                                            <i class="fa-solid fa-video text-brand text-sm"></i>
+                                    <div class="relative w-16 h-16 flex items-center justify-center shrink-0" style="perspective: 300px;">
+                                        <div id="camera-cube" class="relative w-10 h-10 transition-transform duration-100 ease-out" style="transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg);">
+                                            <!-- Frente (Lente) -->
+                                            <div class="absolute inset-0 bg-[#1a1a1a] border-2 border-brand rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(41,151,255,0.3)]" style="transform: translateZ(20px);">
+                                                <div class="w-5 h-5 rounded-full border-2 border-brand/80 bg-black flex items-center justify-center">
+                                                    <div class="w-1.5 h-1.5 rounded-full bg-brand/50"></div>
+                                                </div>
+                                            </div>
+                                            <!-- Atrás -->
+                                            <div class="absolute inset-0 bg-[#151515] border border-white/20 rounded-lg flex items-center justify-center" style="transform: rotateY(180deg) translateZ(20px);">
+                                                <div class="w-6 h-4 bg-white/5 rounded-sm"></div>
+                                            </div>
+                                            <!-- Direita -->
+                                            <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(90deg) translateZ(20px);"></div>
+                                            <!-- Esquerda -->
+                                            <div class="absolute inset-0 bg-[#111111] border border-white/10 rounded-lg" style="transform: rotateY(-90deg) translateZ(20px);"></div>
+                                            <!-- Topo -->
+                                            <div class="absolute inset-0 bg-[#1e1e1e] border border-white/20 rounded-lg flex items-start justify-end p-1" style="transform: rotateX(90deg) translateZ(20px);">
+                                                <div class="w-2 h-1 bg-red-500 rounded-full"></div>
+                                            </div>
+                                            <!-- Fundo -->
+                                            <div class="absolute inset-0 bg-[#0a0a0a] border border-white/5 rounded-lg" style="transform: rotateX(-90deg) translateZ(20px);"></div>
                                         </div>
                                     </div>
                                     <!-- Vertical Slider -->
